@@ -1,6 +1,7 @@
 "use client";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { ArrowRight } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
@@ -16,29 +17,28 @@ export const HeroSection = () => {
             <span className="mr-2 text-primary">
               <Badge>New</Badge>
             </span>
-            <span> Design is out now! </span>
+            <span>
+              IG 社群貼文
+            </span>
           </Badge>
 
           <div className="max-w-screen-md mx-auto text-center text-4xl md:text-6xl font-bold">
             <h1>
-              Experience the
-              <span className="text-transparent px-2 bg-gradient-to-r from-[#D247BF] to-primary bg-clip-text">
-                Shadcn
-              </span>
-              landing page
+              臺大鳥巢
+              <br />
+              <span className="text-primary">NTU NEST</span>
             </h1>
           </div>
 
           <p className="max-w-screen-sm mx-auto text-xl text-muted-foreground">
-            {`We're more than just a tool, we're a community of passionate
-            creators. Get access to exclusive resources, tutorials, and support.`}
+          台大鳥巢 NTU NEST (Nature of Entrepreneurship Skills Team) 是一個屬於新創的溫暖鳥巢、創業家與投資人的基地。
           </p>
 
           <div className="space-y-4 md:space-y-0 md:space-x-4">
-            <Button className="w-5/6 md:w-1/4 font-bold group/arrow">
-              Get Started
+            <Link href="#contact"  className={cn(buttonVariants(),"w-5/6 md:w-1/4 font-bold group/arrow")}>
+              聯絡我們
               <ArrowRight className="size-5 ml-2 group-hover/arrow:translate-x-1 transition-transform" />
-            </Button>
+            </Link>
 
             <Button
               asChild
@@ -46,10 +46,10 @@ export const HeroSection = () => {
               className="w-5/6 md:w-1/4 font-bold"
             >
               <Link
-                href="https://github.com/nobruf/shadcn-landing-page.git"
+                href="https://www.instagram.com/ntu_nest/"
                 target="_blank"
               >
-                Github respository
+                最新消息
               </Link>
             </Button>
           </div>
