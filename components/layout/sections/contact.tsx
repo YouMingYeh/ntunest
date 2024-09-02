@@ -19,14 +19,36 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { useState } from "react";
+import { init, tx, id } from "@instantdb/react";
+import { useToast } from "@/hooks/use-toast";
+
+// ID for app: ntunest
+const APP_ID = "cb675865-1a98-43da-8cb4-4f68d3c93f67";
+
+// Optional: Declare your schema for intellisense!
+type Contact = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  subject: string;
+  message: string;
+};
+
+type Schema = {
+  contacts: Contact;
+};
+
+const db = init<Schema>({ appId: APP_ID });
+async function addContact(contact: Contact) {
+  await db.transact(
+    tx.contacts[id()].update({
+      ...contact,
+      createdAt: Date.now(),
+    })
+  );
+}
 
 const formSchema = z.object({
   firstName: z.string().min(2).max(255),
@@ -43,18 +65,24 @@ export const ContactSection = () => {
       firstName: "",
       lastName: "",
       email: "",
-      subject: "Web Development",
+      subject: "",
       message: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsSubmitting(true);
     const { firstName, lastName, email, subject, message } = values;
-    console.log(values);
-
-    const mailToLink = `mailto:leomirandadev@gmail.com?subject=${subject}&body=Hello I am ${firstName} ${lastName}, my Email is ${email}. %0D%0A${message}`;
-
-    window.location.href = mailToLink;
+    await addContact({ firstName, lastName, email, subject, message });
+    form.reset();
+    toast({
+      title: "Message sent!",
+      description: "We will get back to you as soon as possible."
+    });
+    setIsSubmitting(false);
   }
 
   return (
@@ -179,31 +207,13 @@ export const ContactSection = () => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Subject</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a subject" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="Web Development">
-                              Web Development
-                            </SelectItem>
-                            <SelectItem value="Mobile Development">
-                              Mobile Development
-                            </SelectItem>
-                            <SelectItem value="Figma Design">
-                              Figma Design
-                            </SelectItem>
-                            <SelectItem value="REST API">REST API</SelectItem>
-                            <SelectItem value="FullStack Project">
-                              FullStack Project
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <FormControl>
+                          <Input
+                            type="subject"
+                            placeholder="問題詢問"
+                            {...field}
+                          />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -232,7 +242,9 @@ export const ContactSection = () => {
                   />
                 </div>
 
-                <Button className="mt-4">Send message</Button>
+                <Button className="mt-4" disabled={isSubmitting}>
+                  Send message
+                </Button>
               </form>
             </Form>
           </CardContent>
