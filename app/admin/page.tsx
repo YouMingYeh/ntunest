@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -15,11 +16,13 @@ const APP_ID = "cb675865-1a98-43da-8cb4-4f68d3c93f67";
 
 // Optional: Declare your schema for intellisense!
 type Contact = {
+  id: string;
   firstName: string;
   lastName: string;
   email: string;
   subject: string;
   message: string;
+  createdAt: number;
 };
 
 type Schema = {
@@ -27,6 +30,12 @@ type Schema = {
 };
 
 const db = init<Schema>({ appId: APP_ID });
+
+function deleteContact(contact: Contact) {
+  db.transact(tx.contacts[contact.id].delete())
+}
+
+
 
 export default function Admin({
   searchParams,
@@ -36,6 +45,7 @@ export default function Admin({
   };
 }) {
   const { isLoading, error, data } = db.useQuery({ contacts: {} });
+  console.log(data)
   if (isLoading) {
     return <div>Fetching data...</div>;
   }
@@ -61,6 +71,12 @@ export default function Admin({
             <TableHead>
               Message
             </TableHead>
+            <TableHead>
+              Created At
+              </TableHead>
+            <TableHead>
+              Actions
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -72,6 +88,10 @@ export default function Admin({
                 <TableCell>{contact.email}</TableCell>
                 <TableCell>{contact.subject}</TableCell>
                 <TableCell>{contact.message}</TableCell>
+                <TableCell>{new Date(contact.createdAt).toUTCString()}</TableCell>
+                <TableCell> 
+                  <Button onClick={() => deleteContact(contact)}>Delete</Button>
+                </TableCell>
               </TableRow>
             ))
           }
